@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithmic Trading Bot Simulator</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #FF9A8B, #FF6A88, #FF4E50, #F9D423);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #FFF;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .bot-info {
+            width: 60%;
+            font-size: 1.2em;
+            font-weight: bold;
+            line-height: 1.6;
+        }
+
+        .controls {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            margin: 10px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #8e44ad, #3498db);
+        }
+
+        .stop-btn {
+            background: linear-gradient(45deg, #e74c3c, #f39c12);
+        }
+
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .trade-log {
+            margin-top: 30px;
+        }
+
+        .trade-log h3 {
+            text-align: center;
+            color: #F39C12;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 1.1em;
+            font-weight: bold;
+            animation: slideIn 0.5s ease;
+        }
+
+        span {
+            font-weight: bold;
+            color: #F39C12;
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Algorithmic Trading Bot 💹</h1>
+        </header>
+
+        <div class="info-panel">
+            <div class="bot-info">
+                <h2>Bot Status</h2>
+                <p>Cash: <span id="cash">$1000</span></p>
+                <p>Stock: <span id="stock">0</span> shares</p>
+                <p>Current Price: $<span id="current-price">100</span></p>
+                <p>Total Balance: $<span id="balance">1000</span></p>
+                <p>Profit/Loss: $<span id="profit">0</span></p>
+            </div>
+
+            <div class="controls">
+                <button id="start-btn" class="btn start-btn">Start Bot</button>
+                <button id="stop-btn" class="btn stop-btn" disabled>Stop Bot</button>
+            </div>
+        </div>
+
+        <div class="trade-log">
+            <h3>Trade Log</h3>
+            <ul id="trade-log-list">
+                <!-- Dynamic trades will appear here -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let cash = 1000;
+        let stock = 0;
+        let balance = cash;
+        let previousPrice = 100;
+        let currentPrice = previousPrice;
+        let profit = 0;
+        let trades = [];
+        let botInterval;
+
+        const cashElement = document.getElementById('cash');
+        const stockElement = document.getElementById('stock');
+        const currentPriceElement = document.getElementById('current-price');
+        const balanceElement = document.getElementById('balance');
+        const profitElement = document.getElementById('profit');
+        const tradeLogList = document.getElementById('trade-log-list');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+
+        // Generate random price fluctuations
+        function generatePrice() {
+            const priceChange = Math.floor(Math.random() * 5) - 2;  // Price change between -2 and +2
+            currentPrice = Math.max(0, previousPrice + priceChange);
+            previousPrice = currentPrice;
+            currentPriceElement.textContent = currentPrice.toFixed(2);
+        }
+
+        // Simulate trading decision
+        function makeTrade() {
+            // Buy low strategy
+            if (currentPrice < previousPrice) {
+                const sharesToBuy = Math.floor(cash / currentPrice);
+                if (sharesToBuy > 0) {
+                    cash -= sharesToBuy * currentPrice;
+                    stock += sharesToBuy;
+                    trades.push(`Bought ${sharesToBuy} shares at $${currentPrice.toFixed(2)}`);
+                }
+            }
+            // Sell high strategy
+            else if (currentPrice > previousPrice && stock > 0) {
+                cash += stock * currentPrice;
+                trades.push(`Sold ${stock} shares at $${currentPrice.toFixed(2)}`);
+                stock = 0;
+            }
+
+            // Update balance and profit
+            balance = cash + (stock * currentPrice);
+            profit = balance - 1000;  // Initial investment of $1000
+            updateUI();
+        }
+
+        // Update the UI with the latest data
+        function updateUI() {
+            cashElement.textContent = `$${cash.toFixed(2)}`;
+            stockElement.textContent = stock;
+            balanceElement.textContent = `$${balance.toFixed(2)}`;
+            profitElement.textContent = `$${profit.toFixed(2)}`;
+
+            // Update trade log with animations
+            tradeLogList.innerHTML = trades.map(trade => `<li>${trade}</li>`).join('');
+        }
+
+        // Start the bot and begin trading
+        function startBot() {
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+
+            botInterval = setInterval(() => {
+                generatePrice();
+                makeTrade();
+            }, 1000);  // Update every second
+        }
+
+        // Stop the bot
+        function stopBot() {
+            clearInterval(botInterval);
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startBot);
+        stopBtn.addEventListener('click', stopBot);
+    </script>
+</body>
+</html>

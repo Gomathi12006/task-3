@@ -1,0 +1,140 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(45deg, #FF9A8B, #FF6A88, #FF4E50, #F9D423);
+    background-size: 400% 400%;
+    animation: gradientBackground 15s ease infinite;
+    color: #fff;
+}
+
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #FFF;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.info-panel {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.bot-info {
+    width: 60%;
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.6;
+}
+
+.controls {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn {
+    padding: 12px 18px;
+    margin: 10px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: none;
+    color: #fff;
+}
+
+.start-btn {
+    background: linear-gradient(45deg, #8e44ad, #3498db);
+}
+
+.stop-btn {
+    background: linear-gradient(45deg, #e74c3c, #f39c12);
+}
+
+.btn:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.trade-log {
+    margin-top: 30px;
+}
+
+.trade-log h3 {
+    text-align: center;
+    color: #F39C12;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.1em;
+    font-weight: bold;
+    animation: slideIn 0.5s ease;
+}
+
+span {
+    font-weight: bold;
+    color: #F39C12;
+}
+
+@keyframes gradientBackground {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
